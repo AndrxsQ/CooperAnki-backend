@@ -1,4 +1,4 @@
-package com.coopera2075.cooperanki.config;
+package com.coopera2075.cooperanki.security;
 
 import java.util.List;
 
