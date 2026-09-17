@@ -19,8 +19,13 @@ import lombok.ToString;
 @NoArgsConstructor 
 @ToString 
 @DiscriminatorValue("MANAGER")
-public class Manager extends User {
+public class Manager extends AppUser {
     @ToString.Exclude
     @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Arrangement> arrangements = new ArrayList<>();
+
+    @Override
+    public String getRole() {
+        return "MANAGER";
+    }
 }

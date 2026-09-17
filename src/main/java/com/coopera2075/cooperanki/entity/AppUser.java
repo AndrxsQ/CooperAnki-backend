@@ -30,7 +30,7 @@ import lombok.ToString;
 @EqualsAndHashCode (onlyExplicitlyIncluded = true)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
-public abstract class User {
+public abstract class AppUser {
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -45,4 +45,5 @@ public abstract class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private AuthIdentity authIdentity;
 
+    public abstract String getRole(); // Método abstracto para obtener el rol del usuario
 }

@@ -19,8 +19,13 @@ import lombok.ToString;
 @NoArgsConstructor 
 @ToString 
 @DiscriminatorValue("FUNDER")
-public class Funder extends User {
+public class Funder extends AppUser {
     @ToString.Exclude
     @OneToMany(mappedBy = "funder", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Investment> investments = new ArrayList<>();
+
+    @Override
+    public String getRole() {
+        return "FUNDER";
+    }
 }

@@ -31,7 +31,7 @@ public class AuthIdentity {
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User user;
+    private AppUser user;
 
     @NotBlank (message = "Email is required")
     @Email (message = "Email must be valid")
