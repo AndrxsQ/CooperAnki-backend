@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor 
 public class RegisterRequest {
     @NotBlank (message = "El nombre de usuario no puede estar vacío")
+    @Size (min = 2, max = 50, message = "El nombre de usuario debe tener entre 2 y 50 caracteres")
     private String username;
 
     @NotBlank (message = "El correo electrónico no puede estar vacío")
@@ -21,6 +22,6 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank (message = "La contraseña no puede estar vacía")
-    @Size (min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    @Size (min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres")
     private String password;
 }
