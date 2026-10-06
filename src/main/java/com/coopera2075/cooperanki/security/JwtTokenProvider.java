@@ -38,6 +38,11 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
         
+        return generateToken(username, roles);
+    }
+
+    // Variante para emitir un token sin pasar por el AuthenticationManager (registro, cambio de username)
+    public String generateToken(String username, List<String> roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
@@ -64,7 +69,7 @@ public class JwtTokenProvider {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
+                .parseSignedClaims(token)
                 .getPayload();
     }
 
