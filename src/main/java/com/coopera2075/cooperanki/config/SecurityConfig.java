@@ -2,6 +2,7 @@ package com.coopera2075.cooperanki.config;
 
 import java.util.List;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,11 +13,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.coopera2075.cooperanki.security.CustomUserDetailsService;
+import com.coopera2075.cooperanki.security.JwtAuthenticationFilter;
 
 @Configuration 
 @EnableWebSecurity 
@@ -30,7 +33,10 @@ public class SecurityConfig {
     }
 
     @Bean 
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        JwtAuthenticationFilter jwtAuthenticationFilter
+    ) throws Exception {
         http
             //Deshabilitar CSRF (no required para API REST stateless)
             .csrf(csrf -> csrf.disable())
@@ -45,9 +51,21 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll() // Permitir acceso a rutas de autenticación
                 .anyRequest().authenticated() // Requerir autenticación para cualquier otra ruta
-            );
+            )
+
+            // Validar el JWT de cada petición antes de que se evalúen las reglas de autorización
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // El filtro JWT es un @Component, así que Spring Boot también lo registraría como filtro del servlet
+    // fuera de la cadena de seguridad. Se desactiva ese registro para que solo se ejecute dentro de ella.
+    @Bean
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterRegistration(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>(jwtAuthenticationFilter);
+        registration.setEnabled(false);
+        return registration;
     }
 
     @Bean 
