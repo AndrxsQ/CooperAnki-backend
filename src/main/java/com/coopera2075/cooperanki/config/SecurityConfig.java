@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,6 +28,7 @@ import jakarta.servlet.DispatcherType;
 
 @Configuration 
 @EnableWebSecurity 
+@EnableMethodSecurity // Habilita @PreAuthorize en los controladores para las reglas por rol
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
@@ -64,6 +66,10 @@ public class SecurityConfig {
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 // Permitir acceso a registro y login (/api/v1/auth/me sigue protegido)
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                // Consulta pública de proyectos y convocatorias (páginas públicas del cliente)
+                .requestMatchers(HttpMethod.GET,
+                    "/api/v1/projects", "/api/v1/projects/*",
+                    "/api/v1/calls", "/api/v1/calls/*").permitAll()
                 .anyRequest().authenticated() // Requerir autenticación para cualquier otra ruta
             )
 
