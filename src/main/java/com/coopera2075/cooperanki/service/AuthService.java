@@ -16,6 +16,8 @@ import com.coopera2075.cooperanki.dto.RegisterRequest;
 import com.coopera2075.cooperanki.entity.AppUser;
 import com.coopera2075.cooperanki.entity.AuthIdentity;
 import com.coopera2075.cooperanki.entity.Funder;
+import com.coopera2075.cooperanki.entity.Manager;
+import com.coopera2075.cooperanki.entity.UserRole;
 import com.coopera2075.cooperanki.exception.BadRequestException;
 import com.coopera2075.cooperanki.exception.ConflictException;
 import com.coopera2075.cooperanki.exception.ResourceNotFoundException;
@@ -47,7 +49,8 @@ public class AuthService {
             throw new ConflictException("El correo electrónico ya está registrado");
         }
 
-        Funder appUser = new Funder();
+        // Si no se indica rol, el usuario se registra como FUNDER
+        AppUser appUser = request.getRole() == UserRole.MANAGER ? new Manager() : new Funder();
         appUser.setUsername(request.getUsername());
 
         AuthIdentity authIdentity = new AuthIdentity();
