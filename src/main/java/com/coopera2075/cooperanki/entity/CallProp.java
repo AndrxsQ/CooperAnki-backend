@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -54,7 +55,7 @@ public class CallProp {
     @Column (name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Size (min = 0, message = "Total amount must not be 0")
+    @Positive (message = "Total amount must be greater than 0")
     @Column (name = "total_amount", nullable = true)
     private double totalAmount;
 
