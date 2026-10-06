@@ -39,7 +39,7 @@ public class JwtTokenProvider {
                 .toList();
         
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + 60000); // Cambiar a expirationMs luego de pruebas
+        Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .subject(username)
