@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -42,24 +43,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Extraer el nombre de usuario del token
             String username = jwtTokenProvider.getUsernameFromToken(token);
 
-            // Cargar los detalles del usuario desde la base de datos
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            try {
+                // Cargar los detalles del usuario desde la base de datos
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            // Crear un objeto de autenticación con los detalles del usuario
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities()
-            );
+                // Crear un objeto de autenticación con los detalles del usuario
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities()
+                );
 
-            // Establecer detalles adicionales de la solicitud en el objeto de autenticación
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // Establecer detalles adicionales de la solicitud en el objeto de autenticación
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // Establecer la autenticación en el contexto de seguridad
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } else {
-            // Si el token no es válido, se puede manejar la respuesta aquí (opcional)
-            System.out.println("Token JWT inválido o no presente en la solicitud.");
+                // Establecer la autenticación en el contexto de seguridad
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } catch (UsernameNotFoundException e) {
+                // Token válido de un usuario que ya no existe: la petición continúa sin autenticar
+                SecurityContextHolder.clearContext();
+            }
         }
 
+        // Sin token (o con uno inválido) la petición sigue como anónima: las rutas públicas responden
+        // y las protegidas terminan en 401 a través del AuthenticationEntryPoint
         filterChain.doFilter(request, response);
     }
 
