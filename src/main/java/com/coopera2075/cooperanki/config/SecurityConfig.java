@@ -20,6 +20,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.coopera2075.cooperanki.security.CustomUserDetailsService;
 import com.coopera2075.cooperanki.security.JwtAuthenticationFilter;
+import com.coopera2075.cooperanki.security.RestSecurityErrorHandler;
+
+import jakarta.servlet.DispatcherType;
 
 @Configuration 
 @EnableWebSecurity 
@@ -35,7 +38,8 @@ public class SecurityConfig {
     @Bean 
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http,
-        JwtAuthenticationFilter jwtAuthenticationFilter
+        JwtAuthenticationFilter jwtAuthenticationFilter,
+        RestSecurityErrorHandler securityErrorHandler
     ) throws Exception {
         http
             //Deshabilitar CSRF (no required para API REST stateless)
@@ -47,8 +51,16 @@ public class SecurityConfig {
             // Deshabilitar manejo de sesiones (stateless)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
+            // Responder 401/403 en JSON en lugar del 403 vacío por defecto
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(securityErrorHandler)
+                .accessDeniedHandler(securityErrorHandler)
+            )
+
             // Configuración inicial de rutas
             .authorizeHttpRequests(auth -> auth
+                // El reenvío interno a /error no debe exigir autenticación, o cualquier fallo se convierte en 403
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll() // Permitir acceso a rutas de autenticación
                 .anyRequest().authenticated() // Requerir autenticación para cualquier otra ruta
             )
