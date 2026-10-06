@@ -2,7 +2,6 @@ package com.coopera2075.cooperanki.security;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,10 +13,12 @@ import com.coopera2075.cooperanki.entity.AppUser;
 import com.coopera2075.cooperanki.entity.AuthIdentity;
 import com.coopera2075.cooperanki.repository.AppUserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service 
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired 
-    private AppUserRepository appUserRepository;
+    private final AppUserRepository appUserRepository;
 
     @Override
     @Transactional(readOnly = true)
