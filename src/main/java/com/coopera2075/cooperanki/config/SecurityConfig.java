@@ -43,7 +43,7 @@ public class SecurityConfig {
             
             // Configuración inicial de rutas
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Permitir acceso a rutas de autenticación
+                .requestMatchers("/api/v1/auth/**").permitAll() // Permitir acceso a rutas de autenticación
                 .anyRequest().authenticated() // Requerir autenticación para cualquier otra ruta
             );
 
