@@ -1,5 +1,9 @@
 package com.coopera2075.cooperanki.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -40,6 +44,10 @@ public abstract class AppUser {
     @Size (min = 2, max = 50, message = "Username must be between 2 and 50 characters")
     @Column (name = "username", nullable = false, unique = true)
     private String username;
+
+    @CreationTimestamp
+    @Column (name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @ToString.Exclude
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

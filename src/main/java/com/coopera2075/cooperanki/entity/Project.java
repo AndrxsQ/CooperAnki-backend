@@ -1,7 +1,10 @@
 package com.coopera2075.cooperanki.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -41,6 +44,10 @@ public class Project {
     @Size (max = 255, message = "Project description must not exceed 255 characters")
     @Column (name = "description", nullable = true)
     private String description;
+
+    @CreationTimestamp
+    @Column (name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

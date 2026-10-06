@@ -1,8 +1,11 @@
 package com.coopera2075.cooperanki.entity;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -46,6 +49,10 @@ public class CallProp {
     private Date deadline;
     @Column (name = "status", nullable = true)
     private String status;
+
+    @CreationTimestamp
+    @Column (name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @Size (min = 0, message = "Total amount must not be 0")
     @Column (name = "total_amount", nullable = true)
