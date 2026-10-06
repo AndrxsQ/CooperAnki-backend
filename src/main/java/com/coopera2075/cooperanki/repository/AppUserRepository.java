@@ -9,4 +9,5 @@ import com.coopera2075.cooperanki.entity.AppUser;
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByUsername(String username);
 
+    boolean existsByUsername(String username);
 }
