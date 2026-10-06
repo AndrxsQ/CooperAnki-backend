@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -61,7 +62,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // El reenvío interno a /error no debe exigir autenticación, o cualquier fallo se convierte en 403
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                .requestMatchers("/api/v1/auth/**").permitAll() // Permitir acceso a rutas de autenticación
+                // Permitir acceso a registro y login (/api/v1/auth/me sigue protegido)
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
                 .anyRequest().authenticated() // Requerir autenticación para cualquier otra ruta
             )
 
