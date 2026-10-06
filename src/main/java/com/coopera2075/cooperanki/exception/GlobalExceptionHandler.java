@@ -90,13 +90,16 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.UNAUTHORIZED, "Debes iniciar sesión para acceder a este recurso", request, null);
     }
 
+    // Denegaciones por rol (@PreAuthorize): traen un mensaje genérico de Spring, así que se sustituye
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthorizationDenied(AuthorizationDeniedException ex, HttpServletRequest request) {
+        return build(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta acción", request, null);
+    }
+
+    // Denegaciones lanzadas por los servicios: su mensaje ya explica el motivo
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        // Las denegaciones por rol (@PreAuthorize) traen un mensaje genérico de Spring; las de los servicios explican el motivo
-        String message = ex instanceof AuthorizationDeniedException
-                ? "No tienes permisos para realizar esta acción"
-                : ex.getMessage();
-        return build(HttpStatus.FORBIDDEN, message, request, null);
+        return build(HttpStatus.FORBIDDEN, ex.getMessage(), request, null);
     }
 
     // Red de seguridad por si una restricción de la BD salta antes que las validaciones del servicio
