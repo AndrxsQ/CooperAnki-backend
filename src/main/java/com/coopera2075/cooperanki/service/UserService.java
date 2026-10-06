@@ -44,14 +44,12 @@ public class UserService {
     public List<UserResponse> findAll(UserRole role) {
         Long currentUserId = currentUserProvider.getCurrentUser().getId();
 
-        List<? extends AppUser> users;
-        if (role == UserRole.MANAGER) {
-            users = managerRepository.findAll();
-        } else if (role == UserRole.FUNDER) {
-            users = funderRepository.findAll();
-        } else {
-            users = appUserRepository.findAll();
-        }
+        // Sin filtro (role nulo) se devuelven todos los usuarios
+        List<? extends AppUser> users = switch (role) {
+            case MANAGER -> managerRepository.findAll();
+            case FUNDER -> funderRepository.findAll();
+            case null -> appUserRepository.findAll();
+        };
 
         return users.stream()
                 .map(user -> UserResponse.from(user, user.getId().equals(currentUserId)))
