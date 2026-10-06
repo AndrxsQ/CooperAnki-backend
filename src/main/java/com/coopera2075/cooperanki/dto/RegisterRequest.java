@@ -1,5 +1,7 @@
 package com.coopera2075.cooperanki.dto;
 
+import com.coopera2075.cooperanki.entity.UserRole;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,4 +26,7 @@ public class RegisterRequest {
     @NotBlank (message = "La contraseña no puede estar vacía")
     @Size (min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres")
     private String password;
+
+    // Opcional: si no se envía, el usuario se registra como FUNDER
+    private UserRole role;
 }
