@@ -31,6 +31,8 @@
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<!-- Spring Boot 4.1.1 fija Lombok 1.18.46, que no carga sobre javac 27 (el compilador con el que algunos editores analizan el código). Quitar cuando Spring Boot gestione 1.18.48 o superior -->
 		<lombok.version>1.18.48</lombok.version>
+		<!-- Spring Boot no gestiona la versión de JSoup -->
+		<jsoup.version>1.23.2</jsoup.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -56,6 +58,18 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+		<!-- Cliente HTTP de los scrapers de convocatorias. Solo trae WebClient (con Reactor Netty), no el servidor de WebFlux,
+		     así que la aplicación sigue siendo Spring MVC -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webclient</artifactId>
+		</dependency>
+		<!-- Análisis del HTML de las fuentes de convocatorias -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>${jsoup.version}</version>
 		</dependency>
 
 		<dependency>
