@@ -1,7 +1,7 @@
-package com.coopera2075.cooperanki.entity;
+// package com.coopera2075.cooperanki.entity;
 
-// Coincide con los valores del discriminador "role" de la tabla users
-public enum UserRole {
-    MANAGER,
-    FUNDER
-}
+// // Coincide con los valores del discriminador "role" de la tabla users
+// public enum UserRole {
+//     MANAGER,
+//     FUNDER
+// }

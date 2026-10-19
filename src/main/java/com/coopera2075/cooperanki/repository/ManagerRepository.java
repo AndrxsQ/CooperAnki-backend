@@ -1,9 +1,9 @@
-package com.coopera2075.cooperanki.repository;
+// package com.coopera2075.cooperanki.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.coopera2075.cooperanki.entity.Manager;
+// import com.coopera2075.cooperanki.entity.Manager;
 
-public interface ManagerRepository extends JpaRepository<Manager, Long> {
+// public interface ManagerRepository extends JpaRepository<Manager, Long> {
     
-}
+// }
