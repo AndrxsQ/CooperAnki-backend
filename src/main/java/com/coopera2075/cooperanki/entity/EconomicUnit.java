@@ -47,9 +47,6 @@ public class EconomicUnit {
     @JoinColumn(name = "municipality_id", nullable = false)
     private Municipality municipality;
 
-    @Column(name = "economic_activity")
-    private String economicActivity;
-
     private String address;
 
     @Column(name = "tel_number")
