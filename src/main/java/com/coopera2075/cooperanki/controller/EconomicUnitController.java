@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coopera2075.cooperanki.dto.EconomicActivityResponse;
 import com.coopera2075.cooperanki.dto.EconomicUnitResponse;
+import com.coopera2075.cooperanki.service.EconomicActivityQueryService;
 import com.coopera2075.cooperanki.service.EconomicUnitQueryService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EconomicUnitController {
     private final EconomicUnitQueryService economicUnitQueryService;
+    private final EconomicActivityQueryService economicActivityQueryService;
 
     @GetMapping
     public ResponseEntity<List<EconomicUnitResponse>> findAll() {
@@ -27,5 +30,10 @@ public class EconomicUnitController {
     @GetMapping("/{id}")
     public ResponseEntity<EconomicUnitResponse> findById(@PathVariable Integer id) {
         return ResponseEntity.ok(economicUnitQueryService.findById(id));
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<EconomicActivityResponse>> findActivitiesByUnitId(@PathVariable Integer id) {
+        return ResponseEntity.ok(economicActivityQueryService.findActivitiesByEconomicUnitId(id));
     }
 }
