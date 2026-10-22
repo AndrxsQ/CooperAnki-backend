@@ -9,7 +9,12 @@ import org.springframework.data.repository.query.Param;
 import com.coopera2075.cooperanki.entity.EconomicActivity;
 import com.coopera2075.cooperanki.entity.EconomicUnit;
 
-public interface EconomicActivityRepository extends JpaRepository<EconomicActivity, String> {
+public interface EconomicActivityRepository extends JpaRepository<EconomicActivity, Integer> {
+    @Query("SELECT activity FROM EconomicActivity activity ORDER BY activity.ciiuId")
+    List<EconomicActivity> findAllOrderByCiiuId();
+
+    boolean existsByCiiuId(String ciiuId);
+
     @Query(value = """
             SELECT ea.*
             FROM economic_activities ea
@@ -20,12 +25,4 @@ public interface EconomicActivityRepository extends JpaRepository<EconomicActivi
             """, nativeQuery = true)
     List<EconomicActivity> findAllByEconomicUnitId(@Param("unitId") Integer unitId);
 
-    @Query(value = """
-            SELECT eu.*
-            FROM economic_units eu
-            JOIN unit_activities ua ON ua.unit_id = eu.doc_number
-            WHERE ua.activity_id = :ciiuId
-            ORDER BY eu.id
-            """, nativeQuery = true)
-    List<EconomicUnit> findAllUnitsByActivityCiiuId(@Param("ciiuId") String ciiuId);
 }

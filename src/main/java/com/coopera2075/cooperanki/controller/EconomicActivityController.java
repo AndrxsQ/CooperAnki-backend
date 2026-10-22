@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coopera2075.cooperanki.dto.EconomicUnitResponse;
+import com.coopera2075.cooperanki.dto.EconomicActivityResponse;
 import com.coopera2075.cooperanki.service.EconomicActivityQueryService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EconomicActivityController {
     private final EconomicActivityQueryService economicActivityQueryService;
+
+    @GetMapping
+    public ResponseEntity<List<EconomicActivityResponse>> findAll() {
+        return ResponseEntity.ok(economicActivityQueryService.findAll());
+    }
 
     @GetMapping("/{ciiuId}/units")
     public ResponseEntity<List<EconomicUnitResponse>> findUnitsByActivity(

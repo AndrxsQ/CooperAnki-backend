@@ -19,14 +19,14 @@ public class EconomicUnitQueryService {
 
     @Transactional(readOnly = true)
     public List<EconomicUnitResponse> findAll() {
-        return economicUnitRepository.findAll().stream()
+        return economicUnitRepository.findAllWithActivities().stream()
                 .map(EconomicUnitResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public EconomicUnitResponse findById(Integer id) {
-        return economicUnitRepository.findById(id)
+        return economicUnitRepository.findByIdWithActivities(id)
                 .map(EconomicUnitResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Unidad económica no encontrada con id: " + id));

@@ -21,6 +21,13 @@ public class EconomicActivityQueryService {
     private final EconomicUnitRepository economicUnitRepository;
 
     @Transactional(readOnly = true)
+    public List<EconomicActivityResponse> findAll() {
+        return economicActivityRepository.findAllOrderByCiiuId().stream()
+                .map(EconomicActivityResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<EconomicActivityResponse> findActivitiesByEconomicUnitId(Integer unitId) {
         if (!economicUnitRepository.existsById(unitId)) {
             throw new ResponseStatusException(
@@ -34,12 +41,12 @@ public class EconomicActivityQueryService {
 
     @Transactional(readOnly = true)
     public List<EconomicUnitResponse> findUnitsByActivityCiiuId(String ciiuId) {
-        if (!economicActivityRepository.existsById(ciiuId)) {
+        if (!economicActivityRepository.existsByCiiuId(ciiuId)) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Actividad económica no encontrada con código CIIU: " + ciiuId);
         }
 
-        return economicActivityRepository.findAllUnitsByActivityCiiuId(ciiuId).stream()
+        return economicUnitRepository.findAllWithActivitiesByCiiuId(ciiuId).stream()
                 .map(EconomicUnitResponse::from)
                 .toList();
     }
