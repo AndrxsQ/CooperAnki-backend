@@ -17,7 +17,7 @@ public record EconomicUnitResponse(
         String nodeName,
         List<EconomicActivityResponse> activities,
         String address,
-        Integer telNumber,
+        Long telNumber,
         String email,
         Integer organizationId,
         String organizationName
