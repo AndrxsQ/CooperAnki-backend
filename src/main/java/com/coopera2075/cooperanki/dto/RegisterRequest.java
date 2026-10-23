@@ -1,26 +1,32 @@
-package com.coopera2075.cooperanki.dto;
+// package com.coopera2075.cooperanki.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+// import com.coopera2075.cooperanki.entity.UserRole;
 
-@Data 
-@Builder 
-@AllArgsConstructor 
-@NoArgsConstructor 
-public class RegisterRequest {
-    @NotBlank (message = "El nombre de usuario no puede estar vacío")
-    private String username;
+// import jakarta.validation.constraints.Email;
+// import jakarta.validation.constraints.NotBlank;
+// import jakarta.validation.constraints.Size;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Data;
+// import lombok.NoArgsConstructor;
 
-    @NotBlank (message = "El correo electrónico no puede estar vacío")
-    @Email (message = "El correo electrónico debe tener un formato válido")
-    private String email;
+// @Data 
+// @Builder 
+// @AllArgsConstructor 
+// @NoArgsConstructor 
+// public class RegisterRequest {
+//     @NotBlank (message = "El nombre de usuario no puede estar vacío")
+//     @Size (min = 2, max = 50, message = "El nombre de usuario debe tener entre 2 y 50 caracteres")
+//     private String username;
 
-    @NotBlank (message = "La contraseña no puede estar vacía")
-    @Size (min = 8, message = "La contraseña debe tener al menos 8 caracteres")
-    private String password;
-}
+//     @NotBlank (message = "El correo electrónico no puede estar vacío")
+//     @Email (message = "El correo electrónico debe tener un formato válido")
+//     private String email;
+
+//     @NotBlank (message = "La contraseña no puede estar vacía")
+//     @Size (min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres")
+//     private String password;
+
+//     // Opcional: si no se envía, el usuario se registra como FUNDER
+//     private UserRole role;
+// }

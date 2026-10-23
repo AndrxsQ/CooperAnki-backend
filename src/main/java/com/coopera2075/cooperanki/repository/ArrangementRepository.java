@@ -1,9 +1,32 @@
-package com.coopera2075.cooperanki.repository;
+// package com.coopera2075.cooperanki.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+// import java.util.List;
 
-import com.coopera2075.cooperanki.entity.Arrangement;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.Query;
+// import org.springframework.data.repository.query.Param;
 
-public interface ArrangementRepository extends JpaRepository<Arrangement, Long> {
+// import com.coopera2075.cooperanki.entity.Arrangement;
 
-}
+// public interface ArrangementRepository extends JpaRepository<Arrangement, Long> {
+//     boolean existsByManagerIdAndProjectId(Long managerId, Long projectId);
+
+//     List<Arrangement> findByProjectId(Long projectId);
+
+//     List<Arrangement> findByManagerId(Long managerId);
+
+//     List<Arrangement> findByManagerIdAndProjectId(Long managerId, Long projectId);
+
+//     long countByProjectId(Long projectId);
+
+//     // Proyectos que se quedarían sin ningún manager si este desapareciera
+//     @Query("""
+//             select count(a) from Arrangement a
+//             where a.manager.id = :managerId
+//               and not exists (
+//                   select 1 from Arrangement other
+//                   where other.project = a.project and other.manager.id <> :managerId
+//               )
+//             """)
+//     long countProjectsManagedOnlyBy(@Param("managerId") Long managerId);
+// }

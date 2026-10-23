@@ -1,63 +1,74 @@
-package com.coopera2075.cooperanki.entity;
+// package com.coopera2075.cooperanki.entity;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+// import java.time.LocalDate;
+// import java.time.LocalDateTime;
+// import java.util.ArrayList;
+// import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+// import org.hibernate.annotations.CreationTimestamp;
 
-@Entity 
-@Table (name = "calls_prop")
-@Getter 
-@Setter 
-@NoArgsConstructor 
-@ToString 
-@EqualsAndHashCode (onlyExplicitlyIncluded = true)
-public class CallProp {
-    @Id 
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
-    private Long id;
+// import jakarta.persistence.CascadeType;
+// import jakarta.persistence.Column;
+// import jakarta.persistence.Entity;
+// import jakarta.persistence.EnumType;
+// import jakarta.persistence.Enumerated;
+// import jakarta.persistence.FetchType;
+// import jakarta.persistence.GeneratedValue;
+// import jakarta.persistence.GenerationType;
+// import jakarta.persistence.Id;
+// import jakarta.persistence.JoinColumn;
+// import jakarta.persistence.ManyToOne;
+// import jakarta.persistence.OneToMany;
+// import jakarta.persistence.Table;
+// import jakarta.validation.constraints.NotBlank;
+// import jakarta.validation.constraints.Positive;
+// import jakarta.validation.constraints.Size;
+// import lombok.EqualsAndHashCode;
+// import lombok.Getter;
+// import lombok.NoArgsConstructor;
+// import lombok.Setter;
+// import lombok.ToString;
 
-    @NotBlank (message = "Title is required")
-    @Size (min = 2, max = 100, message = "Title must be between 2 and 100 characters")
-    @Column (name = "title", nullable = false)
-    private String title;
-    @Column (name = "body", nullable = true)
-    private String body;
-    @Column (name = "deadline", nullable = true)
-    private Date deadline;
-    @Column (name = "status", nullable = true)
-    private String status;
+// @Entity 
+// @Table (name = "calls_prop")
+// @Getter 
+// @Setter 
+// @NoArgsConstructor 
+// @ToString 
+// @EqualsAndHashCode (onlyExplicitlyIncluded = true)
+// public class CallProp {
+//     @Id 
+//     @GeneratedValue (strategy = GenerationType.IDENTITY)
+//     @EqualsAndHashCode.Include
+//     private Long id;
 
-    @Size (min = 0, message = "Total amount must not be 0")
-    @Column (name = "total_amount", nullable = true)
-    private double totalAmount;
+//     @NotBlank (message = "Title is required")
+//     @Size (min = 2, max = 100, message = "Title must be between 2 and 100 characters")
+//     @Column (name = "title", nullable = false)
+//     private String title;
+//     @Column (name = "body", nullable = true)
+//     private String body;
+//     @Column (name = "deadline", nullable = true)
+//     private LocalDate deadline;
+//     @Enumerated (EnumType.STRING)
+//     @Column (name = "status", nullable = true)
+//     private CallStatus status;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "callProp", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Investment> investments = new ArrayList<>();
+//     @CreationTimestamp
+//     @Column (name = "created_at", updatable = false)
+//     private LocalDateTime createdAt;
 
-    @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+//     @Positive (message = "Total amount must be greater than 0")
+//     @Column (name = "total_amount", nullable = true)
+//     private double totalAmount;
 
-}
+//     @ToString.Exclude
+//     @OneToMany(mappedBy = "callProp", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//     private List<Investment> investments = new ArrayList<>();
+
+//     @ToString.Exclude
+//     @ManyToOne(fetch = FetchType.LAZY)
+//     @JoinColumn(name = "project_id", nullable = false)
+//     private Project project;
+
+// }
