@@ -56,7 +56,7 @@ public class EconomicUnit {
     private String address;
 
     @Column(name = "tel_number")
-    private Integer telNumber;
+    private Long telNumber;
 
     private String email;
 
