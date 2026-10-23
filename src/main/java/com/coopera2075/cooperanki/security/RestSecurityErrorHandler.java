@@ -1,35 +1,44 @@
-// package com.coopera2075.cooperanki.security;
+package com.coopera2075.cooperanki.security;
 
-// import org.springframework.beans.factory.annotation.Qualifier;
-// import org.springframework.security.access.AccessDeniedException;
-// import org.springframework.security.core.AuthenticationException;
-// import org.springframework.security.web.AuthenticationEntryPoint;
-// import org.springframework.security.web.access.AccessDeniedHandler;
-// import org.springframework.stereotype.Component;
-// import org.springframework.web.servlet.HandlerExceptionResolver;
+import java.io.IOException;
 
-// import jakarta.servlet.http.HttpServletRequest;
-// import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
 
-// // Los rechazos de la cadena de filtros ocurren antes de llegar a los controladores, así que
-// // se delegan al GlobalExceptionHandler para responder 401/403 con el mismo JSON que el resto de la API.
-// @Component
-// public class RestSecurityErrorHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
-//     private final HandlerExceptionResolver handlerExceptionResolver;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-//     public RestSecurityErrorHandler(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver) {
-//         this.handlerExceptionResolver = handlerExceptionResolver;
-//     }
+@Component
+public class RestSecurityErrorHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
+    @Override
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException exception) throws IOException {
+        writeError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                "{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Debes iniciar sesión para acceder a este recurso\"}");
+    }
 
-//     // Petición sin autenticar a una ruta protegida -> 401
-//     @Override
-//     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) {
-//         handlerExceptionResolver.resolveException(request, response, null, authException);
-//     }
+    @Override
+    public void handle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AccessDeniedException exception) throws IOException {
+        writeError(response, HttpServletResponse.SC_FORBIDDEN,
+                "{\"status\":403,\"error\":\"Forbidden\",\"message\":\"No tienes permisos para acceder a este recurso\"}");
+    }
 
-//     // Usuario autenticado sin permisos suficientes -> 403
-//     @Override
-//     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) {
-//         handlerExceptionResolver.resolveException(request, response, null, accessDeniedException);
-//     }
-// }
+    private void writeError(
+            HttpServletResponse response,
+            int status,
+            String body) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        response.getWriter().write(body);
+    }
+}

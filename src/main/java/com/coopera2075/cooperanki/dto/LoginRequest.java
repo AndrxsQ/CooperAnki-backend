@@ -1,19 +1,13 @@
-// package com.coopera2075.cooperanki.dto;
+package com.coopera2075.cooperanki.dto;
 
-// import jakarta.validation.constraints.NotBlank;
-// import lombok.AllArgsConstructor;
-// import lombok.Builder;
-// import lombok.Data;
-// import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-// @Data 
-// @Builder 
-// @AllArgsConstructor 
-// @NoArgsConstructor 
-// public class LoginRequest {
-//     @NotBlank (message = "El nombre de usuario no puede estar vacío")
-//     private String username;
-    
-//     @NotBlank (message = "La contraseña no puede estar vacía")
-//     private String password;
-// }
+public record LoginRequest(
+        @NotBlank(message = "El usuario es obligatorio")
+        @Size(max = 255, message = "El usuario no puede superar 255 caracteres")
+        String username,
+        @NotBlank(message = "La contraseña es obligatoria")
+        @Size(max = 72, message = "La contraseña no puede superar 72 caracteres")
+        String password) {
+}
