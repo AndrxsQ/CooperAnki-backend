@@ -46,9 +46,14 @@ public class SurveySubmissionService {
         for (Map.Entry<String, JsonNode> answerEntry : request.getAnswers().entrySet()) {
             SurveyQuestion question = questionsByCode.get(answerEntry.getKey());
             if (question == null) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "La respuesta '" + answerEntry.getKey() + "' no corresponde a una pregunta enviada");
+                question = createIndexedQuestion(
+                        answerEntry.getKey(), response, questions, questionsByCode, questionCodes);
+                if (question == null) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "La respuesta '" + answerEntry.getKey()
+                                    + "' no corresponde a una pregunta enviada");
+                }
             }
 
             SurveyAnswer answer = new SurveyAnswer();
@@ -59,6 +64,43 @@ public class SurveySubmissionService {
 
         response.setQuestions(questions);
         return surveyResponseRepository.save(response);
+    }
+
+    private SurveyQuestion createIndexedQuestion(
+            String code,
+            SurveyResponse response,
+            List<SurveyQuestion> questions,
+            Map<String, SurveyQuestion> questionsByCode,
+            Set<String> questionCodes) {
+        int indexSeparator = code.lastIndexOf('.');
+        if (indexSeparator <= 0 || indexSeparator == code.length() - 1
+                || !code.substring(indexSeparator + 1).matches("[0-9]+")) {
+            return null;
+        }
+
+        SurveyQuestion parent = questionsByCode.get(code.substring(0, indexSeparator));
+        if (parent == null || !isRepeatable(parent.getType())) {
+            return null;
+        }
+
+        SurveyQuestion question = new SurveyQuestion();
+        question.setResponse(response);
+        question.setParentQuestion(parent);
+        question.setCode(code);
+        question.setSection(parent.getSection());
+        question.setPrompt(parent.getPrompt());
+        question.setType(parent.getType());
+        question.setDisplayOrder(parent.getDisplayOrder());
+        question.setOptions(parent.getOptions());
+        question.setMetadata(parent.getMetadata());
+        addQuestion(question, questions, questionsByCode, questionCodes);
+        return question;
+    }
+
+    private boolean isRepeatable(String type) {
+        return type != null && (type.startsWith("repeat-")
+                || "income-details".equals(type)
+                || "income-amounts".equals(type));
     }
 
     private SurveyQuestion createQuestion(
