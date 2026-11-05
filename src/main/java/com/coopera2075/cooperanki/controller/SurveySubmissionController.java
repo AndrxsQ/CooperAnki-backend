@@ -2,6 +2,7 @@ package com.coopera2075.cooperanki.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class SurveySubmissionController {
     private final SurveySubmissionService surveySubmissionService;
 
     @PostMapping("/responses")
+    @PreAuthorize("permitAll()")
     @Operation(security = {})
     public ResponseEntity<SurveySubmissionResponse> submit(
             @Valid @RequestBody SurveySubmissionRequest request) {
