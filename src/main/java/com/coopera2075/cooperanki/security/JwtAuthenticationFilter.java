@@ -30,6 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         return "OPTIONS".equalsIgnoreCase(request.getMethod())
                 || ("/api/v1/auth/login".equals(request.getServletPath())
+                        && "POST".equalsIgnoreCase(request.getMethod()))
+                || ("/api/v1/auth/refresh".equals(request.getServletPath())
                         && "POST".equalsIgnoreCase(request.getMethod()));
     }
 
