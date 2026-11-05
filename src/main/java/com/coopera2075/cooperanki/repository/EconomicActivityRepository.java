@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.coopera2075.cooperanki.entity.EconomicActivity;
-import com.coopera2075.cooperanki.entity.EconomicUnit;
 
 public interface EconomicActivityRepository extends JpaRepository<EconomicActivity, Integer> {
     @Query("SELECT activity FROM EconomicActivity activity ORDER BY activity.ciiuId")
