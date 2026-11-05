@@ -12,6 +12,7 @@ import com.coopera2075.cooperanki.dto.AuthResponse;
 import com.coopera2075.cooperanki.dto.LoginRequest;
 import com.coopera2075.cooperanki.service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
+    @Operation(security = {})
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }

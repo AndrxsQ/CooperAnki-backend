@@ -12,6 +12,7 @@ import com.coopera2075.cooperanki.dto.SurveySubmissionResponse;
 import com.coopera2075.cooperanki.entity.SurveyResponse;
 import com.coopera2075.cooperanki.service.SurveySubmissionService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ public class SurveySubmissionController {
     private final SurveySubmissionService surveySubmissionService;
 
     @PostMapping("/responses")
+    @Operation(security = {})
     public ResponseEntity<SurveySubmissionResponse> submit(
             @Valid @RequestBody SurveySubmissionRequest request) {
         SurveyResponse response = surveySubmissionService.submit(request);
