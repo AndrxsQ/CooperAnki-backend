@@ -1,0 +1,41 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - "**/*.java"
+      - "pom.xml"
+      - "mvnw"
+      - ".mvn/**"
+      - "config/checkstyle/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    paths:
+      - "**/*.java"
+      - "pom.xml"
+      - "mvnw"
+      - ".mvn/**"
+      - "config/checkstyle/**"
+      - ".github/workflows/backend-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Compile, lint, and test (Java 21)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Verify backend
+        run: bash ./mvnw --batch-mode --no-transfer-progress verify
