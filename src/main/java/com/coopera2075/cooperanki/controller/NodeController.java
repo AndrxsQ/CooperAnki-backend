@@ -3,6 +3,7 @@ package com.coopera2075.cooperanki.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/nodes")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('ADMIN', 'EXECUTIVE')")
 public class NodeController {
     private final NodeQueryService nodeQueryService;
 
