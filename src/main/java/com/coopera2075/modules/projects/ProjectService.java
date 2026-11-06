@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.coopera2075.modules.auth.User;
 import com.coopera2075.modules.auth.UserRepository;
 import com.coopera2075.modules.organizations.Organization;
-import com.coopera2075.modules.organizations.OrganizationRepository;
+import com.coopera2075.modules.organizations.CooperaOrganizationRepository;
 import com.coopera2075.modules.projects.dto.ProjectPageResponse;
 import com.coopera2075.modules.projects.dto.ProjectRequest;
 import com.coopera2075.modules.projects.dto.ProjectResponse;
@@ -31,7 +31,7 @@ public class ProjectService {
     private static final String COOPERA_SUBJECT_PREFIX = "coopera:";
 
     private final ProjectRepository projectRepository;
-    private final OrganizationRepository organizationRepository;
+    private final CooperaOrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final ProjectDocumentStorageService storageService;
 

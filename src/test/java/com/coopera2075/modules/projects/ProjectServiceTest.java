@@ -22,7 +22,7 @@ import com.coopera2075.modules.auth.Role;
 import com.coopera2075.modules.auth.User;
 import com.coopera2075.modules.auth.UserRepository;
 import com.coopera2075.modules.organizations.Organization;
-import com.coopera2075.modules.organizations.OrganizationRepository;
+import com.coopera2075.modules.organizations.CooperaOrganizationRepository;
 import com.coopera2075.modules.projects.dto.ProjectRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +31,7 @@ class ProjectServiceTest {
     private ProjectRepository projectRepository;
 
     @Mock
-    private OrganizationRepository organizationRepository;
+    private CooperaOrganizationRepository organizationRepository;
 
     @Mock
     private UserRepository userRepository;

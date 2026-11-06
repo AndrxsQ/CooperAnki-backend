@@ -41,7 +41,7 @@ import com.coopera2075.modules.auth.dto.CreatedUserResponse;
 import com.coopera2075.modules.auth.dto.RefreshTokenRequest;
 import com.coopera2075.modules.auth.dto.RoleOptionResponse;
 import com.coopera2075.modules.organizations.Organization;
-import com.coopera2075.modules.organizations.OrganizationRepository;
+import com.coopera2075.modules.organizations.CooperaOrganizationRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,7 +57,7 @@ public class AuthService {
     private final AuthIdentityRepository authIdentityRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final OrganizationRepository organizationRepository;
+    private final CooperaOrganizationRepository organizationRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
@@ -69,7 +69,7 @@ public class AuthService {
             AuthIdentityRepository authIdentityRepository,
             UserRepository userRepository,
             RoleRepository roleRepository,
-            OrganizationRepository organizationRepository,
+            CooperaOrganizationRepository organizationRepository,
             RefreshTokenRepository refreshTokenRepository,
             PasswordEncoder passwordEncoder,
             CustomUserDetailsService userDetailsService,
