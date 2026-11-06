@@ -25,8 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.coopera2075.cooperanki.dto.AuthResponse;
 import com.coopera2075.cooperanki.dto.LoginRequest;
-import com.coopera2075.cooperanki.entity.AuthIdentity;
-import com.coopera2075.cooperanki.repository.AuthIdentityRepository;
 import com.coopera2075.cooperanki.security.CustomUserDetailsService;
 import com.coopera2075.cooperanki.security.JwtTokenProvider;
 import com.coopera2075.modules.auth.LoginSystem;
@@ -54,7 +52,6 @@ public class AuthService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final AuthenticationManager authenticationManager;
-    private final AuthIdentityRepository authIdentityRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CooperaOrganizationRepository organizationRepository;
@@ -66,7 +63,6 @@ public class AuthService {
 
     public AuthService(
             AuthenticationManager authenticationManager,
-            AuthIdentityRepository authIdentityRepository,
             UserRepository userRepository,
             RoleRepository roleRepository,
             CooperaOrganizationRepository organizationRepository,
@@ -80,7 +76,6 @@ public class AuthService {
             throw new IllegalArgumentException("jwt.refresh-expiration-ms debe ser positivo");
         }
         this.authenticationManager = authenticationManager;
-        this.authIdentityRepository = authIdentityRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.organizationRepository = organizationRepository;
@@ -95,19 +90,14 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         ensurePasswordWithinBcryptLimit(request.password());
         String identifier = request.username().trim();
-        String principal = identifier;
-        if (request.system() == LoginSystem.ECONOMIC_UNITS) {
-            principal = "economic-units:" + identifier;
-        } else if (request.system() == LoginSystem.COOPERA) {
-            principal = COOPERA_SUBJECT_PREFIX + identifier;
-        }
+        String principal = COOPERA_SUBJECT_PREFIX + identifier;
 
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken.unauthenticated(principal, request.password()));
         } catch (AuthenticationException exception) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Correo o contraseña incorrectos");
         }
 
         String accessToken = jwtTokenProvider.generateToken(authentication);
@@ -150,8 +140,7 @@ public class AuthService {
     public CreatedUserResponse register(CreateUserRequest request) {
         ensurePasswordWithinBcryptLimit(request.password());
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
-        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)
-                || authIdentityRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado");
         }
 
@@ -193,47 +182,29 @@ public class AuthService {
     }
 
     private AuthResponse toResponse(String subject, String accessToken, String refreshToken) {
-        if (subject.startsWith(COOPERA_SUBJECT_PREFIX)) {
-            User account = userRepository.findByEmailWithRoleAndPermissions(
-                            subject.substring(COOPERA_SUBJECT_PREFIX.length()))
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.UNAUTHORIZED, "Credenciales incorrectas"));
-            List<String> systems = account.getRole().getPermissions().stream()
-                    .map(permission -> permission.getCode())
-                    .filter(code -> code.startsWith("SYSTEM_") && code.endsWith("_ACCESS"))
-                    .map(code -> code.substring("SYSTEM_".length(), code.length() - "_ACCESS".length()))
-                    .distinct()
-                    .sorted()
-                    .toList();
-            return new AuthResponse(
-                    accessToken,
-                    "Bearer",
-                    account.getId(),
-                    account.getFullName(),
-                    account.getEmail(),
-                    account.getEmail(),
-                    account.getRole().getName(),
-                    LoginSystem.COOPERA.name(),
-                    systems,
-                    refreshToken);
-        }
-
-        String username = subject.startsWith("economic-units:")
-                ? subject.substring("economic-units:".length())
+        String email = subject.startsWith(COOPERA_SUBJECT_PREFIX)
+                ? subject.substring(COOPERA_SUBJECT_PREFIX.length())
                 : subject;
-        AuthIdentity identity = authIdentityRepository.findByUsernameWithUser(username)
+        User account = userRepository.findByEmailWithRoleAndPermissions(email)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "Credenciales incorrectas"));
+        List<String> systems = account.getRole().getPermissions().stream()
+                .map(permission -> permission.getCode())
+                .filter(code -> code.startsWith("SYSTEM_") && code.endsWith("_ACCESS"))
+                .map(code -> code.substring("SYSTEM_".length(), code.length() - "_ACCESS".length()))
+                .distinct()
+                .sorted()
+                .toList();
         return new AuthResponse(
                 accessToken,
                 "Bearer",
-                identity.getUser().getId().longValue(),
-                identity.getUser().getName(),
-                identity.getUsername(),
-                identity.getEmail(),
-                identity.getUser().getRole().name(),
-                LoginSystem.ECONOMIC_UNITS.name(),
-                List.of(LoginSystem.ECONOMIC_UNITS.name()),
+                account.getId(),
+                account.getFullName(),
+                account.getEmail(),
+                account.getEmail(),
+                account.getRole().getName(),
+                LoginSystem.COOPERA.name(),
+                systems,
                 refreshToken);
     }
 

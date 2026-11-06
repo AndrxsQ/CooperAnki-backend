@@ -21,7 +21,7 @@ import lombok.Setter;
 @Entity
 @Table(
         name = "roles",
-        schema = "coopera",
+        schema = "public",
         uniqueConstraints = @UniqueConstraint(name = "uq_roles_name", columnNames = "name"))
 @Getter
 @Setter
@@ -40,7 +40,7 @@ public class Role {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "role_permissions",
-            schema = "coopera",
+            schema = "public",
             joinColumns = @JoinColumn(name = "role_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "permission_id", nullable = false))
     private Set<Permission> permissions = new HashSet<>();

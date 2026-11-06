@@ -20,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Table(
         name = "project_attachments",
-        schema = "coopera",
+        schema = "public",
         indexes = @Index(name = "idx_project_attachments_project_id", columnList = "project_id"))
 @Getter
 @Setter

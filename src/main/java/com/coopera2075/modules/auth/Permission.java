@@ -14,7 +14,7 @@ import lombok.Setter;
 @Entity
 @Table(
         name = "permissions",
-        schema = "coopera",
+        schema = "public",
         uniqueConstraints = @UniqueConstraint(name = "uq_permissions_code", columnNames = "code"))
 @Getter
 @Setter

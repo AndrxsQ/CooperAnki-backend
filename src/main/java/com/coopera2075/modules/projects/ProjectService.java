@@ -149,12 +149,12 @@ public class ProjectService {
     private User findCurrentAdmin(String principal) {
         if (principal == null || !principal.startsWith(COOPERA_SUBJECT_PREFIX)) {
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Se requiere una cuenta administrativa del sistema Coopera");
+                    HttpStatus.FORBIDDEN, "Se requiere una cuenta administrativa del sistema de cooperación");
         }
         String email = principal.substring(COOPERA_SUBJECT_PREFIX.length());
         User user = userRepository.findByEmailWithRoleAndPermissions(email)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "La cuenta no pertenece al sistema Coopera"));
+                        HttpStatus.FORBIDDEN, "La cuenta no pertenece al sistema de cooperación"));
         if (!"ADMIN".equals(user.getRole().getName())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Solo un administrador puede gestionar proyectos");

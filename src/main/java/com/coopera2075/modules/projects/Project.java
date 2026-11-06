@@ -38,7 +38,7 @@ import lombok.Setter;
 @Entity
 @Table(
         name = "projects",
-        schema = "coopera",
+        schema = "public",
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_projects_identifier_code",
                 columnNames = "identifier_code"),
