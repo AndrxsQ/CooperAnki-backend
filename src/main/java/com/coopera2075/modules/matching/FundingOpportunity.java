@@ -35,6 +35,9 @@ public class FundingOpportunity {
     @Column(name = "cooperating_entity", length = 150)
     private String cooperatingEntity;
 
+    @Column(name = "impact_area", length = 150)
+    private String impactArea;
+
     @Column(name = "requirements_description", columnDefinition = "text")
     private String requirementsDescription;
 

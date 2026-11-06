@@ -2,10 +2,14 @@ package com.coopera2075.modules.matching;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ProjectMatchRepository extends JpaRepository<ProjectMatch, Long> {
+public interface ProjectMatchRepository extends
+        JpaRepository<ProjectMatch, Long>, JpaSpecificationExecutor<ProjectMatch> {
+    @Override
     @EntityGraph(attributePaths = "fundingOpportunity")
-    Page<ProjectMatch> findByProject_Id(Long projectId, Pageable pageable);
+    Page<ProjectMatch> findAll(Specification<ProjectMatch> specification, Pageable pageable);
 }

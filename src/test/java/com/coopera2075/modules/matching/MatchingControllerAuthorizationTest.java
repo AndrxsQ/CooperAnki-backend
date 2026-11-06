@@ -38,7 +38,7 @@ class MatchingControllerAuthorizationTest {
 
         assertThrows(
                 AccessDeniedException.class,
-                () -> matchingController.getRecommendations(1L, 0, 20));
+                () -> matchingController.getRecommendations(1L, null, null, null, null, 0, 20));
     }
 
     @Configuration
