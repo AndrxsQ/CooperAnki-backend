@@ -14,8 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "organizations", schema = "coopera")
+@Entity(name = "CooperaOrganization")
+@Table(name = "cooperation_organizations", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor

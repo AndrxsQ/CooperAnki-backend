@@ -2,5 +2,5 @@ package com.coopera2075.modules.organizations;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrganizationRepository extends JpaRepository<Organization, Long> {
+public interface CooperaOrganizationRepository extends JpaRepository<Organization, Long> {
 }

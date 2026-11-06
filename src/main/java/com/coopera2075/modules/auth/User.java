@@ -19,7 +19,7 @@ import lombok.Setter;
 @Entity
 @Table(
         name = "users",
-        schema = "coopera",
+        schema = "public",
         uniqueConstraints = @UniqueConstraint(name = "uq_users_email", columnNames = "email"))
 @Getter
 @Setter

@@ -15,9 +15,9 @@ public class OpenApiConfig {
     public OpenAPI cooperaOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Coopera2075 API")
+                        .title("Coopera2075 - Gestión de información y cooperación")
                         .version("v1")
-                        .description("API REST de la plataforma Coopera2075."))
+                        .description("API REST de los sistemas de gestión de información y cooperación de Coopera2075."))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)

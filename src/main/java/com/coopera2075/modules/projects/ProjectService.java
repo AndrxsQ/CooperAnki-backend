@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.coopera2075.modules.auth.User;
 import com.coopera2075.modules.auth.UserRepository;
 import com.coopera2075.modules.organizations.Organization;
-import com.coopera2075.modules.organizations.OrganizationRepository;
+import com.coopera2075.modules.organizations.CooperaOrganizationRepository;
 import com.coopera2075.modules.projects.dto.ProjectPageResponse;
 import com.coopera2075.modules.projects.dto.ProjectRequest;
 import com.coopera2075.modules.projects.dto.ProjectResponse;
@@ -31,7 +31,7 @@ public class ProjectService {
     private static final String COOPERA_SUBJECT_PREFIX = "coopera:";
 
     private final ProjectRepository projectRepository;
-    private final OrganizationRepository organizationRepository;
+    private final CooperaOrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final ProjectDocumentStorageService storageService;
 
@@ -149,12 +149,12 @@ public class ProjectService {
     private User findCurrentAdmin(String principal) {
         if (principal == null || !principal.startsWith(COOPERA_SUBJECT_PREFIX)) {
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Se requiere una cuenta administrativa del sistema Coopera");
+                    HttpStatus.FORBIDDEN, "Se requiere una cuenta administrativa del sistema de cooperación");
         }
         String email = principal.substring(COOPERA_SUBJECT_PREFIX.length());
         User user = userRepository.findByEmailWithRoleAndPermissions(email)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "La cuenta no pertenece al sistema Coopera"));
+                        HttpStatus.FORBIDDEN, "La cuenta no pertenece al sistema de cooperación"));
         if (!"ADMIN".equals(user.getRole().getName())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Solo un administrador puede gestionar proyectos");

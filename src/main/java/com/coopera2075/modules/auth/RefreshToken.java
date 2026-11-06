@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "refresh_tokens", schema = "coopera")
+@Table(name = "refresh_tokens", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
