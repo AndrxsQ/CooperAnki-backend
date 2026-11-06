@@ -1,12 +1,21 @@
 package com.coopera2075.modules.projects;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,6 +31,7 @@ import com.coopera2075.modules.projects.dto.ProjectPageResponse;
 import com.coopera2075.modules.projects.dto.ProjectRequest;
 import com.coopera2075.modules.projects.dto.ProjectResponse;
 import com.coopera2075.modules.projects.dto.ProjectStatusRequest;
+import com.coopera2075.modules.projects.dto.ProjectAttachmentResponse;
 
 import jakarta.validation.Valid;
 
@@ -38,6 +48,7 @@ public class ProjectController {
             "startsAt", "closesAt");
 
     private final ProjectService projectService;
+    private final ProjectAttachmentService attachmentService;
 
     @GetMapping
     public ResponseEntity<ProjectPageResponse> findAll(
@@ -91,5 +102,62 @@ public class ProjectController {
     public ResponseEntity<Void> delete(@PathVariable long id) {
         projectService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{projectId}/attachments")
+    public ResponseEntity<java.util.List<ProjectAttachmentResponse>> findAttachments(
+            @PathVariable long projectId) {
+        return ResponseEntity.ok(attachmentService.findAll(projectId));
+    }
+
+    @PostMapping(path = "/{projectId}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProjectAttachmentResponse> uploadAttachment(
+            @PathVariable long projectId,
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(attachmentService.upload(projectId, file));
+    }
+
+    @GetMapping("/{projectId}/attachments/{attachmentId}/content")
+    public ResponseEntity<StreamingResponseBody> downloadAttachment(
+            @PathVariable long projectId,
+            @PathVariable long attachmentId) {
+        ProjectAttachmentService.DownloadedProjectAttachment attachment =
+                attachmentService.download(projectId, attachmentId);
+        StreamingResponseBody body = outputStream -> {
+            try (var input = attachment.content()) {
+                input.transferTo(outputStream);
+            } catch (IOException exception) {
+                throw new java.io.UncheckedIOException("No se pudo transmitir el adjunto", exception);
+            }
+        };
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename(attachment.fileName(), StandardCharsets.UTF_8)
+                .build());
+        headers.setContentType(parseMediaType(attachment.mimeType()));
+        if (attachment.sizeBytes() != null) {
+            headers.setContentLength(attachment.sizeBytes());
+        }
+        headers.setCacheControl("no-store");
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{projectId}/attachments/{attachmentId}")
+    public ResponseEntity<Void> deleteAttachment(
+            @PathVariable long projectId,
+            @PathVariable long attachmentId) {
+        attachmentService.delete(projectId, attachmentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    private MediaType parseMediaType(String mimeType) {
+        if (mimeType == null || mimeType.isBlank()) {
+            return MediaType.APPLICATION_OCTET_STREAM;
+        }
+        try {
+            return MediaType.parseMediaType(mimeType);
+        } catch (org.springframework.http.InvalidMediaTypeException exception) {
+            return MediaType.APPLICATION_OCTET_STREAM;
+        }
     }
 }

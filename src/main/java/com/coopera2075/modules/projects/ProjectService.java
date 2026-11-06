@@ -33,6 +33,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
+    private final ProjectDocumentStorageService storageService;
 
     @Transactional(readOnly = true)
     public ProjectPageResponse findAll(
@@ -102,6 +103,7 @@ public class ProjectService {
     @Transactional
     public void delete(long id) {
         Project project = findProject(id);
+        project.getAttachments().forEach(attachment -> storageService.delete(attachment.getS3Url()));
         projectRepository.delete(project);
     }
 

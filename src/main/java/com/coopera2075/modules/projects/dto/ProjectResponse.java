@@ -2,7 +2,6 @@ package com.coopera2075.modules.projects.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
 import com.coopera2075.modules.projects.Project;
 import com.coopera2075.modules.projects.ProjectStatus;
@@ -21,8 +20,7 @@ public record ProjectResponse(
         Instant startsAt,
         Instant closesAt,
         Instant createdAt,
-        Instant updatedAt,
-        List<ProjectAttachmentResponse> attachments) {
+        Instant updatedAt) {
     public static ProjectResponse from(Project project) {
         return new ProjectResponse(
                 project.getId(),
@@ -38,14 +36,6 @@ public record ProjectResponse(
                 project.getStartsAt(),
                 project.getClosesAt(),
                 project.getCreatedAt(),
-                project.getUpdatedAt(),
-                project.getAttachments().stream()
-                        .map(attachment -> new ProjectAttachmentResponse(
-                                attachment.getId(),
-                                attachment.getFileName(),
-                                attachment.getS3Url(),
-                                attachment.getMimeType(),
-                                attachment.getSizeBytes()))
-                        .toList());
+                project.getUpdatedAt());
     }
 }

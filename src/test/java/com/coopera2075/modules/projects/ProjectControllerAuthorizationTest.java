@@ -72,7 +72,7 @@ class ProjectControllerAuthorizationTest {
 
         @Bean
         ProjectController projectController(ProjectService projectService) {
-            return new ProjectController(projectService);
+            return new ProjectController(projectService, mock(ProjectAttachmentService.class));
         }
     }
 }
