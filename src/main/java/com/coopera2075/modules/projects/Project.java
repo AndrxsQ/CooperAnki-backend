@@ -80,6 +80,12 @@ public class Project {
     @Column(name = "requested_budget", precision = 15, scale = 2)
     private BigDecimal requestedBudget;
 
+    @Column(name = "starts_at")
+    private Instant startsAt;
+
+    @Column(name = "closes_at")
+    private Instant closesAt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ProjectStatus status = ProjectStatus.DRAFT;
