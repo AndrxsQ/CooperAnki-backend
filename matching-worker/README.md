@@ -2,10 +2,12 @@
 
 Independent Python service scaffold for the matching and scraping worker.
 
-This initial scaffold intentionally provides only a health endpoint and
-conservative Scrapy defaults. It does not include portal connectors, spiders,
-extraction endpoints, queues, persistence, or embedding generation. Those
-behaviors remain pending definition.
+The worker exposes a health endpoint and an API-key-protected endpoint for
+queueing registered Scrapy spiders through Redis/RQ. The RQ worker runs each
+Scrapy crawl in a separate process to avoid reusing Twisted's reactor across
+jobs. No portal connectors or spiders are included until source portals and
+their access policies are selected. Persistence and embedding generation are
+also out of scope.
 
 ## Run locally
 
@@ -18,16 +20,28 @@ python -m pip install -e ".[dev]"
 python -m uvicorn matching_worker.app:app --app-dir src --reload
 ```
 
-Health check: `GET http://localhost:8000/health`
+Set `REDIS_URL` to a reachable Redis instance and `MATCHING_WORKER_API_KEY` to
+a secret shared only with trusted backend callers. Start the queue worker in a
+second terminal:
+
+```powershell
+python -m matching_worker.worker
+```
+
+Health check: `GET http://localhost:8000/health`. Job submission:
+`POST /jobs/scraping`, with `X-Worker-API-Key` and JSON containing a registered
+`spiderName` and optional string-valued `spiderArguments`. Until a spider
+connector is added, submissions are rejected with `422`.
 
 ## Run with Docker
 
-From this directory:
+From the repository root, configure `MATCHING_WORKER_API_KEY`, then run:
 
 ```powershell
-docker build -t coopera-matching-worker .
-docker run --rm -p 8000:8000 coopera-matching-worker
+docker compose up --build redis matching-worker-api matching-worker-queue
 ```
+
+The API is bound to `127.0.0.1:8000` and Redis is not exposed outside the host.
 
 ## Scrapy safety defaults
 
