@@ -16,7 +16,9 @@ import com.coopera2075.cooperanki.dto.AuthResponse;
 import com.coopera2075.cooperanki.dto.LoginRequest;
 import com.coopera2075.cooperanki.service.AuthService;
 import com.coopera2075.modules.auth.dto.CreateUserRequest;
+import com.coopera2075.modules.auth.dto.ClientRegistrationRequest;
 import com.coopera2075.modules.auth.dto.CreatedUserResponse;
+import com.coopera2075.modules.auth.dto.LogoutRequest;
 import com.coopera2075.modules.auth.dto.RefreshTokenRequest;
 import com.coopera2075.modules.auth.dto.RoleOptionResponse;
 
@@ -44,6 +46,15 @@ public class AuthController {
         return ResponseEntity.ok(authService.refresh(request));
     }
 
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> logout(
+            Authentication authentication,
+            @Valid @RequestBody LogoutRequest request) {
+        authService.logout(authentication.getName(), request);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/roles")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<RoleOptionResponse>> getAvailableRoles() {
@@ -54,6 +65,14 @@ public class AuthController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreatedUserResponse> register(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
+
+    @PostMapping("/register/client")
+    @PreAuthorize("permitAll()")
+    @Operation(security = {})
+    public ResponseEntity<CreatedUserResponse> registerClient(
+            @Valid @RequestBody ClientRegistrationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerClient(request));
     }
 
     @GetMapping("/me")
