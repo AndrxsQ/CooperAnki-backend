@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
 from pydantic import field_validator
+from pydantic.alias_generators import to_camel
 from sentence_transformers import SentenceTransformer
 
 TARGET_DIMENSIONS = 1536
@@ -18,7 +19,11 @@ WHITESPACE_PATTERN = re.compile(r"\s+")
 
 
 class EmbeddingInput(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        alias_generator=to_camel,
+    )
 
     entity_type: str = Field(pattern=r"^(project|funding_opportunity)$")
     entity_id: str | int = Field(alias="id")

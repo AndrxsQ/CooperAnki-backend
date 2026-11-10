@@ -2,6 +2,7 @@ import hmac
 import os
 
 from fastapi import Depends
+from fastapi import Body
 from fastapi import FastAPI
 from fastapi import Header
 from fastapi import HTTPException
@@ -10,13 +11,15 @@ from pydantic import BaseModel
 from pydantic import Field
 from redis.exceptions import RedisError
 
+from matching_worker.embeddings import EmbeddingInput
+from matching_worker.embeddings import generate_embedding
 from matching_worker.queue import enqueue_scraping_job
 from matching_worker.queue import get_redis_connection
 
 app = FastAPI(
     title="Coopera2075 Matching Worker",
-    description="API interna para encolar trabajos de scraping.",
-    version="0.2.0",
+    description="API interna para embeddings y trabajos de scraping.",
+    version="0.3.0",
 )
 
 
@@ -42,6 +45,15 @@ class ScrapingJobRequest(BaseModel):
 class ScrapingJobResponse(BaseModel):
     job_id: str = Field(serialization_alias="jobId")
     status: str
+
+
+class EmbeddingApiResponse(BaseModel):
+    entityType: str
+    entityId: str | int
+    model: str
+    modelDimensions: int
+    dimensions: int
+    embedding: list[float]
 
 
 def verify_worker_api_key(
@@ -78,3 +90,31 @@ def enqueue_scraping(
             detail=str(exception),
         ) from exception
     return ScrapingJobResponse(job_id=job.id, status="queued")
+
+
+@app.post(
+    "/embeddings",
+    response_model=list[EmbeddingApiResponse],
+    tags=["embeddings"],
+    dependencies=[Depends(verify_worker_api_key)],
+)
+def generate_embeddings(
+    records: list[EmbeddingInput] = Body(min_length=1, max_length=16),
+) -> list[EmbeddingApiResponse]:
+    identifiers = [(record.entity_type, str(record.entity_id)) for record in records]
+    if len(identifiers) != len(set(identifiers)):
+        raise HTTPException(
+            status_code=422,
+            detail="El lote no puede contener registros duplicados",
+        )
+    return [
+        EmbeddingApiResponse(
+            entityType=result.entity_type,
+            entityId=result.entity_id,
+            model=result.model,
+            modelDimensions=result.model_dimensions,
+            dimensions=result.dimensions,
+            embedding=result.embedding,
+        )
+        for result in (generate_embedding(record) for record in records)
+    ]

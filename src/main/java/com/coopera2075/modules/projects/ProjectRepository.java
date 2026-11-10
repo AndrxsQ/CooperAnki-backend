@@ -12,6 +12,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 
     boolean existsByIdentifierCodeAndIdNot(String identifierCode, Long id);
 
+    Page<Project> findAllByEmbeddingVectorIsNull(Pageable pageable);
+
     @Override
     @EntityGraph(attributePaths = {"organization", "creator"})
     Page<Project> findAll(Specification<Project> specification, Pageable pageable);

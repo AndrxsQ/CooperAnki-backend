@@ -2,9 +2,9 @@
 
 Independent Python service scaffold for the matching and scraping worker.
 
-The worker exposes a health endpoint, an API-key-protected endpoint for
-queueing registered Scrapy spiders through Redis/RQ, and a local embedding
-generation script. The RQ worker runs each Scrapy crawl in a separate process
+The worker exposes a health endpoint, API-key-protected endpoints for
+generating local embeddings and queueing registered Scrapy spiders through
+Redis/RQ, and a local embedding generation script. The RQ worker runs each Scrapy crawl in a separate process
 to avoid reusing Twisted's reactor across jobs. No portal connectors or spiders
 are included until source portals and their access policies are selected.
 
@@ -51,8 +51,15 @@ valid contact and confirm the portal's terms and access policy.
 
 ## Generate embeddings
 
-The JSONL script accepts `project` and `funding_opportunity` records and writes
-one JSONL result per input. The first run downloads the configured model from
+The internal `POST /embeddings` endpoint accepts a batch of 1 to 16
+`project` or `funding_opportunity` records and returns their embeddings. It
+requires the `X-Worker-API-Key` header. Its JSON uses camelCase fields such as
+`entityType`, `executiveSummary` and `entityId`. The Spring Boot scheduler uses
+this endpoint to process records without a stored vector and then calculates
+recommendations in PostgreSQL.
+
+The JSONL script accepts the same record types and writes one JSONL result per
+input. The first run downloads the configured model from
 Hugging Face; inference is local, and record text is not sent to an embedding
 provider. The default multilingual model produces 768 values, which are
 normalized and zero-padded to the database's 1536 dimensions. Zero-padding
