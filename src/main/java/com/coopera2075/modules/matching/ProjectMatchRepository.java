@@ -20,6 +20,31 @@ public interface ProjectMatchRepository extends
     @Modifying
     @Transactional
     @Query(value = """
+            DELETE FROM public.project_matches AS existing_match
+            WHERE existing_match.match_status = 'SUGGESTED'
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM public.projects p
+                  WHERE p.id = existing_match.project_id
+                    AND p.embedding_vector IS NOT NULL
+                    AND EXISTS (
+                        SELECT 1
+                        FROM (
+                            SELECT opportunity.id
+                            FROM public.funding_opportunities opportunity
+                            WHERE opportunity.embedding_vector IS NOT NULL
+                            ORDER BY opportunity.embedding_vector <=> p.embedding_vector
+                            LIMIT :maxRecommendationsPerProject
+                        ) nearest
+                        WHERE nearest.id = existing_match.funding_opportunity_id
+                    )
+              )
+            """, nativeQuery = true)
+    int deleteStaleSuggestedMatches(@Param("maxRecommendationsPerProject") int maxRecommendationsPerProject);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
             INSERT INTO public.project_matches AS current_match (
                 project_id,
                 funding_opportunity_id,

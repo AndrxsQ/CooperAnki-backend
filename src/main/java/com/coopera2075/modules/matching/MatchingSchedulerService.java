@@ -34,6 +34,7 @@ public class MatchingSchedulerService {
         }
         int projectsEmbedded = generateProjectEmbeddings();
         int opportunitiesEmbedded = generateOpportunityEmbeddings();
+        projectMatchRepository.deleteStaleSuggestedMatches(maxRecommendationsPerProject);
         int matchesUpdated = projectMatchRepository.refreshSuggestedMatches(maxRecommendationsPerProject);
         return new CycleResult(projectsEmbedded, opportunitiesEmbedded, matchesUpdated);
     }

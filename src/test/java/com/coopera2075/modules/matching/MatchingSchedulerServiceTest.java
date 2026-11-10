@@ -68,6 +68,7 @@ class MatchingSchedulerServiceTest {
         assertEquals(1536, opportunity.getEmbeddingVector().length);
         verify(projectRepository).saveAll(anyList());
         verify(fundingOpportunityRepository).saveAll(anyList());
+        verify(projectMatchRepository).deleteStaleSuggestedMatches(eq(50));
         verify(projectMatchRepository).refreshSuggestedMatches(eq(50));
     }
 

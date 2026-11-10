@@ -1,6 +1,7 @@
 package com.coopera2075.modules.projects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -127,6 +128,61 @@ class ProjectServiceTest {
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
         verifyNoInteractions(organizationRepository);
+    }
+
+    @Test
+    void clearsEmbeddingWhenSemanticProjectContentChanges() {
+        Organization organization = new Organization();
+        organization.setId(8L);
+        organization.setName("Coopera");
+        User creator = userWithRole("ADMIN");
+        creator.setId(12L);
+        Project project = new Project();
+        project.setId(3L);
+        project.setOrganization(organization);
+        project.setCreator(creator);
+        project.setIdentifierCode("PRJ-001");
+        project.setTitle("Old title");
+        project.setExecutiveSummary("Existing summary");
+        project.setEmbeddingVector(new float[] {1.0f});
+        when(projectRepository.findById(3L)).thenReturn(Optional.of(project));
+        when(projectRepository.existsByIdentifierCodeAndIdNot("PRJ-001", 3L)).thenReturn(false);
+        when(organizationRepository.findById(8L)).thenReturn(Optional.of(organization));
+        when(projectRepository.save(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        projectService.update(
+                3L,
+                new ProjectRequest(8L, "PRJ-001", "New title", "Existing summary", null, null, null));
+
+        assertNull(project.getEmbeddingVector());
+    }
+
+    @Test
+    void retainsEmbeddingWhenOnlyNonSemanticProjectFieldsChange() {
+        Organization organization = new Organization();
+        organization.setId(8L);
+        organization.setName("Coopera");
+        User creator = userWithRole("ADMIN");
+        creator.setId(12L);
+        Project project = new Project();
+        project.setId(3L);
+        project.setOrganization(organization);
+        project.setCreator(creator);
+        project.setIdentifierCode("PRJ-001");
+        project.setTitle("Same title");
+        project.setExecutiveSummary("Same summary");
+        float[] embedding = {1.0f};
+        project.setEmbeddingVector(embedding);
+        when(projectRepository.findById(3L)).thenReturn(Optional.of(project));
+        when(projectRepository.existsByIdentifierCodeAndIdNot("PRJ-001", 3L)).thenReturn(false);
+        when(organizationRepository.findById(8L)).thenReturn(Optional.of(organization));
+        when(projectRepository.save(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        projectService.update(
+                3L,
+                new ProjectRequest(8L, "PRJ-001", "Same title", "Same summary", null, null, null));
+
+        org.junit.jupiter.api.Assertions.assertSame(embedding, project.getEmbeddingVector());
     }
 
     private ProjectRequest validRequest() {
