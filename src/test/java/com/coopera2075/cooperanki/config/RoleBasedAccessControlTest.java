@@ -46,22 +46,36 @@ class RoleBasedAccessControlTest {
     }
 
     @Test
-    void rejectsCooperaRolesFromEconomicUnitsEndpoints() {
-        authenticateAs("ROLE_COOPERANT");
+    void rejectsCooperationOnlyRoleFromInformationManagementEndpoints() {
+        authenticateAs("ROLE_GENERAL_EXE", "PERM_SYSTEM_COOPERATION_ACCESS");
 
         assertThrows(AccessDeniedException.class, () -> economicUnitController.findAll());
     }
 
     @Test
-    void allowsExecutiveRoleOnEconomicUnitsEndpoints() {
-        authenticateAs("ROLE_EXECUTIVE");
+    void allowsTerritorialExecutiveOnInformationManagementEndpoints() {
+        authenticateAs("ROLE_TERRITORIAL_EXE", "PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS");
 
         assertEquals(HttpStatus.OK, economicUnitController.findAll().getStatusCode());
     }
 
     @Test
+    void allowsLegalExecutiveOnInformationManagementEndpoints() {
+        authenticateAs("ROLE_LEGAL_EXE", "PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS");
+
+        assertEquals(HttpStatus.OK, economicUnitController.findAll().getStatusCode());
+    }
+
+    @Test
+    void rejectsPersonalAccountRoleFromInformationManagementEndpoints() {
+        authenticateAs("ROLE_CLIENT", "PERM_SYSTEM_PERSONAL_ACCOUNT_ACCESS");
+
+        assertThrows(AccessDeniedException.class, () -> economicUnitController.findAll());
+    }
+
+    @Test
     void restrictsRoleManagementToAdministrators() {
-        authenticateAs("ROLE_EXECUTIVE");
+        authenticateAs("ROLE_GENERAL_EXE", "PERM_SYSTEM_COOPERATION_ACCESS", "PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS");
 
         assertThrows(AccessDeniedException.class, () -> authController.getAvailableRoles());
 

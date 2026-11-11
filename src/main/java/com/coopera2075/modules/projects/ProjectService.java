@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.coopera2075.modules.auth.ApplicationRole;
+import com.coopera2075.modules.auth.ApplicationSubsystem;
 import com.coopera2075.modules.auth.User;
 import com.coopera2075.modules.auth.UserRepository;
 import com.coopera2075.modules.organizations.Organization;
@@ -58,7 +60,7 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse create(ProjectRequest request, String principal) {
-        User creator = findCurrentAdmin(principal);
+        User creator = findCooperationUser(principal);
         validateSchedule(request.startsAt(), request.closesAt());
         String identifierCode = normalizeIdentifierCode(request.identifierCode());
         if (projectRepository.existsByIdentifierCode(identifierCode)) {
@@ -151,18 +153,21 @@ public class ProjectService {
         project.setClosesAt(request.closesAt());
     }
 
-    private User findCurrentAdmin(String principal) {
+    private User findCooperationUser(String principal) {
         if (principal == null || !principal.startsWith(COOPERA_SUBJECT_PREFIX)) {
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Se requiere una cuenta administrativa del sistema de cooperación");
+                    HttpStatus.FORBIDDEN, "Se requiere una cuenta del sistema de cooperación");
         }
         String email = principal.substring(COOPERA_SUBJECT_PREFIX.length());
         User user = userRepository.findByEmailWithRoleAndPermissions(email)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "La cuenta no pertenece al sistema de cooperación"));
-        if (!"ADMIN".equals(user.getRole().getName())) {
+        boolean canUseCooperation = ApplicationRole.fromName(user.getRole().getName())
+                .filter(role -> role.allows(ApplicationSubsystem.COOPERATION))
+                .isPresent();
+        if (!canUseCooperation) {
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Solo un administrador puede gestionar proyectos");
+                    HttpStatus.FORBIDDEN, "Se requiere acceso al sistema de cooperación");
         }
         return user;
     }

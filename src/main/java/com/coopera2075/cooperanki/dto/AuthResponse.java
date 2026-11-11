@@ -15,5 +15,6 @@ public record AuthResponse(
         String role,
         String accountSystem,
         List<String> allowedSystems,
-        String refreshToken) {
+        String refreshToken,
+        String defaultSystem) {
 }

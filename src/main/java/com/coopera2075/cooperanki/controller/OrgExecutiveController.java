@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/org-executives")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN', 'EXECUTIVE')")
+@PreAuthorize("hasAuthority('PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS')")
 public class OrgExecutiveController {
     private final OrgExecutiveQueryService orgExecutiveQueryService;
 

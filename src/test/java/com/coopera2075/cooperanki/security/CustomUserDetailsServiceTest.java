@@ -1,6 +1,7 @@
 package com.coopera2075.cooperanki.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.coopera2075.modules.auth.Permission;
 import com.coopera2075.modules.auth.Role;
 import com.coopera2075.modules.auth.User;
@@ -36,9 +38,22 @@ class CustomUserDetailsServiceTest {
         assertEquals("coopera:person@example.com", user.getUsername());
         assertTrue(user.isEnabled());
         assertTrue(user.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_TERRITORIAL_TRAINER")));
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_TERRITORIAL_EXE")));
         assertTrue(user.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("PERM_SYSTEM_COOPERA_ACCESS")));
+                .anyMatch(authority -> authority.getAuthority().equals(
+                        "PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS")));
+    }
+
+    @Test
+    void rejectsAccountsWithRolesOutsideTheSupportedSet() {
+        User account = cooperaUser();
+        account.getRole().setName("COOPERANT");
+        when(userRepository.findByEmailWithRoleAndPermissions("person@example.com"))
+                .thenReturn(Optional.of(account));
+
+        assertThrows(
+                UsernameNotFoundException.class,
+                () -> userDetailsService.loadUserByUsername("person@example.com"));
     }
 
     @Test
@@ -53,10 +68,10 @@ class CustomUserDetailsServiceTest {
 
     private User cooperaUser() {
         Permission permission = new Permission();
-        permission.setCode("SYSTEM_COOPERA_ACCESS");
+        permission.setCode("SYSTEM_INFORMATION_MANAGEMENT_ACCESS");
 
         Role role = new Role();
-        role.setName("TERRITORIAL_TRAINER");
+        role.setName("TERRITORIAL_EXE");
         role.setPermissions(java.util.Set.of(permission));
 
         User account = new User();

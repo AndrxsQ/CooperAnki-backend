@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/economic-activities")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN', 'EXECUTIVE')")
+@PreAuthorize("hasAuthority('PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS')")
 public class EconomicActivityController {
     private final EconomicActivityQueryService economicActivityQueryService;
 

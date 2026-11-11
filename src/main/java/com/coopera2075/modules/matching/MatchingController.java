@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/recommendations")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN') and hasAuthority('PERM_SYSTEM_COOPERA_ACCESS')")
+@PreAuthorize("hasAuthority('PERM_SYSTEM_COOPERATION_ACCESS')")
 public class MatchingController {
     private static final int DEFAULT_PAGE_SIZE = 20;
     private static final int MAX_PAGE_SIZE = 100;
