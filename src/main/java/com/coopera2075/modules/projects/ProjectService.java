@@ -2,6 +2,7 @@ package com.coopera2075.modules.projects;
 
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,6 +90,10 @@ public class ProjectService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "La organización indicada no existe"));
         project.setOrganization(organization);
+        if (!Objects.equals(project.getTitle(), request.title().trim())
+                || !Objects.equals(project.getExecutiveSummary(), request.executiveSummary())) {
+            project.setEmbeddingVector(null);
+        }
         applyRequest(project, request, identifierCode);
         return ProjectResponse.from(projectRepository.save(project));
     }

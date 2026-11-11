@@ -30,3 +30,47 @@ services:
       S3_ENDPOINT: ${S3_ENDPOINT:-}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      MATCHING_WORKER_URL: ${MATCHING_WORKER_URL:-http://matching-worker-api:8000}
+      MATCHING_WORKER_API_KEY: ${MATCHING_WORKER_API_KEY:-}
+      MATCHING_SCHEDULER_ENABLED: ${MATCHING_SCHEDULER_ENABLED:-true}
+      MATCHING_SCHEDULER_FIXED_DELAY_MS: ${MATCHING_SCHEDULER_FIXED_DELAY_MS:-3600000}
+      MATCHING_SCHEDULER_INITIAL_DELAY_MS: ${MATCHING_SCHEDULER_INITIAL_DELAY_MS:-60000}
+      MATCHING_MAX_RECOMMENDATIONS_PER_PROJECT: ${MATCHING_MAX_RECOMMENDATIONS_PER_PROJECT:-50}
+    depends_on:
+      matching-worker-api:
+        condition: service_healthy
+
+  matching-worker-api:
+    build:
+      context: ./matching-worker
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MATCHING_WORKER_API_KEY: ${MATCHING_WORKER_API_KEY:-}
+      MATCHING_WORKER_USER_AGENT: ${MATCHING_WORKER_USER_AGENT:-}
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  matching-worker-queue:
+    build:
+      context: ./matching-worker
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["python", "-m", "matching_worker.worker"]
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MATCHING_WORKER_USER_AGENT: ${MATCHING_WORKER_USER_AGENT:-}

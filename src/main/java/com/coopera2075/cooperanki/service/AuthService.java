@@ -35,7 +35,9 @@ import com.coopera2075.modules.auth.RoleRepository;
 import com.coopera2075.modules.auth.User;
 import com.coopera2075.modules.auth.UserRepository;
 import com.coopera2075.modules.auth.dto.CreateUserRequest;
+import com.coopera2075.modules.auth.dto.ClientRegistrationRequest;
 import com.coopera2075.modules.auth.dto.CreatedUserResponse;
+import com.coopera2075.modules.auth.dto.LogoutRequest;
 import com.coopera2075.modules.auth.dto.RefreshTokenRequest;
 import com.coopera2075.modules.auth.dto.RoleOptionResponse;
 import com.coopera2075.modules.organizations.Organization;
@@ -137,6 +139,19 @@ public class AuthService {
     }
 
     @Transactional
+    public void logout(String subject, LogoutRequest request) {
+        String tokenHash = hashRefreshToken(request.refreshToken());
+        RefreshToken storedToken = refreshTokenRepository.findByTokenHashForUpdate(tokenHash)
+                .filter(token -> token.getSubject().equals(subject))
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "El refresh token no es válido"));
+        if (storedToken.getRevokedAt() == null) {
+            storedToken.setRevokedAt(Instant.now());
+            refreshTokenRepository.save(storedToken);
+        }
+    }
+
+    @Transactional
     public CreatedUserResponse register(CreateUserRequest request) {
         ensurePasswordWithinBcryptLimit(request.password());
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
@@ -158,6 +173,32 @@ public class AuthService {
         account.setPasswordHash(passwordEncoder.encode(request.password()));
         account.setRole(role);
         account.setOrganization(organization);
+        account.setActive(true);
+
+        User savedAccount = userRepository.save(account);
+        return new CreatedUserResponse(
+                savedAccount.getId(),
+                savedAccount.getFullName(),
+                savedAccount.getEmail(),
+                savedAccount.getRole().getName(),
+                savedAccount.isActive());
+    }
+
+    @Transactional
+    public CreatedUserResponse registerClient(ClientRegistrationRequest request) {
+        ensurePasswordWithinBcryptLimit(request.password());
+        String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado");
+        }
+
+        Role role = roleRepository.findByName("CLIENT")
+                .orElseThrow(() -> new IllegalStateException("El rol CLIENT no está configurado"));
+        User account = new User();
+        account.setFullName(request.fullName().trim());
+        account.setEmail(normalizedEmail);
+        account.setPasswordHash(passwordEncoder.encode(request.password()));
+        account.setRole(role);
         account.setActive(true);
 
         User savedAccount = userRepository.save(account);

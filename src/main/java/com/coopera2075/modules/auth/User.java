@@ -48,4 +48,7 @@ public class User {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @Column(name = "email_notifications_enabled", nullable = false)
+    private boolean emailNotificationsEnabled = true;
 }
