@@ -30,15 +30,15 @@ END $$;
 
 UPDATE public.users account
 SET role_id = target_role.id
-FROM public.roles current_role
+FROM public.roles source_role
 JOIN public.roles target_role
-    ON target_role.name = CASE current_role.name
+    ON target_role.name = CASE source_role.name
         WHEN 'COOPERANT' THEN 'GENERAL_EXE'
         WHEN 'EXECUTIVE' THEN 'GENERAL_EXE'
         WHEN 'TERRITORIAL_TRAINER' THEN 'TERRITORIAL_EXE'
     END
-WHERE account.role_id = current_role.id
-  AND current_role.name IN ('COOPERANT', 'EXECUTIVE', 'TERRITORIAL_TRAINER');
+WHERE account.role_id = source_role.id
+  AND source_role.name IN ('COOPERANT', 'EXECUTIVE', 'TERRITORIAL_TRAINER');
 
 DELETE FROM public.role_permissions;
 
