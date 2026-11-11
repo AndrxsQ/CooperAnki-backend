@@ -40,7 +40,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN') and hasAuthority('PERM_SYSTEM_COOPERA_ACCESS')")
+@PreAuthorize("hasAuthority('PERM_SYSTEM_COOPERATION_ACCESS')")
 public class ProjectController {
     private static final int MAX_PAGE_SIZE = 100;
     private static final java.util.Set<String> ALLOWED_SORT_PROPERTIES = java.util.Set.of(

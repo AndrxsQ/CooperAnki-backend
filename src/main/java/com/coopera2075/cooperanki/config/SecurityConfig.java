@@ -52,7 +52,26 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/roles").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/surveys/responses").permitAll()
-                        .requestMatchers("/api/v1/projects/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/projects", "/api/v1/projects/**")
+                        .hasAuthority("PERM_SYSTEM_COOPERATION_ACCESS")
+                        .requestMatchers(
+                                "/api/v1/departments",
+                                "/api/v1/departments/**",
+                                "/api/v1/municipalities",
+                                "/api/v1/municipalities/**",
+                                "/api/v1/organizations",
+                                "/api/v1/organizations/**",
+                                "/api/v1/nodes",
+                                "/api/v1/nodes/**",
+                                "/api/v1/org-executives",
+                                "/api/v1/org-executives/**",
+                                "/api/v1/economic-activities",
+                                "/api/v1/economic-activities/**",
+                                "/api/v1/economic-units",
+                                "/api/v1/economic-units/**")
+                        .hasAuthority("PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS")
+                        .requestMatchers("/api/v1/account", "/api/v1/account/**")
+                        .hasAuthority("PERM_SYSTEM_PERSONAL_ACCOUNT_ACCESS")
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

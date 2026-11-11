@@ -30,26 +30,46 @@ class ProjectControllerAuthorizationTest {
     }
 
     @Test
-    void preventsNonAdminUsersFromReadingProjects() {
-        authenticateAs("ROLE_COOPERANT");
+    void preventsUsersWithoutCooperationSubsystemFromReadingProjects() {
+        authenticateAs("ROLE_CLIENT", "PERM_SYSTEM_PERSONAL_ACCOUNT_ACCESS");
 
         assertThrows(AccessDeniedException.class, () -> projectController.findById(1L));
     }
 
     @Test
-    void preventsEconomicUnitsAdminWithoutCooperaPermissionFromReadingProjects() {
-        authenticateAs("ROLE_ADMIN");
+    void preventsInformationManagementAdminWithoutCooperationPermissionFromReadingProjects() {
+        authenticateAs("ROLE_ADMIN", "PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS");
 
         assertThrows(AccessDeniedException.class, () -> projectController.findById(1L));
     }
 
     @Test
-    void allowsCooperaAdminsToReadProjects() {
-        authenticateAs("ROLE_ADMIN", "PERM_SYSTEM_COOPERA_ACCESS");
+    void allowsGeneralExecutivesToReadProjects() {
+        authenticateAs("ROLE_GENERAL_EXE", "PERM_SYSTEM_COOPERATION_ACCESS");
 
         org.junit.jupiter.api.Assertions.assertEquals(
                 HttpStatus.OK,
                 projectController.findById(1L).getStatusCode());
+    }
+
+    @Test
+    void allowsCooperationRolesToChangeProjects() {
+        authenticateAs("ROLE_GENERAL_EXE", "PERM_SYSTEM_COOPERATION_ACCESS");
+
+        org.junit.jupiter.api.Assertions.assertEquals(
+                HttpStatus.CREATED,
+                projectController.create(
+                        null,
+                        SecurityContextHolder.getContext().getAuthentication()).getStatusCode());
+    }
+
+    @Test
+    void rejectsProjectChangesWithoutCooperationSubsystem() {
+        authenticateAs("ROLE_LEGAL_EXE", "PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS");
+
+        assertThrows(
+                AccessDeniedException.class,
+                () -> projectController.create(null, null));
     }
 
     private void authenticateAs(String... authorities) {

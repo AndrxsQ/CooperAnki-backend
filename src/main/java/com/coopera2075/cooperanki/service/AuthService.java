@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ import com.coopera2075.cooperanki.dto.AuthResponse;
 import com.coopera2075.cooperanki.dto.LoginRequest;
 import com.coopera2075.cooperanki.security.CustomUserDetailsService;
 import com.coopera2075.cooperanki.security.JwtTokenProvider;
-import com.coopera2075.modules.auth.LoginSystem;
+import com.coopera2075.modules.auth.ApplicationRole;
 import com.coopera2075.modules.auth.RefreshToken;
 import com.coopera2075.modules.auth.RefreshTokenRepository;
 import com.coopera2075.modules.auth.Role;
@@ -161,6 +162,9 @@ public class AuthService {
 
         Role role = roleRepository.findById(request.roleId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rol indicado no existe"));
+        if (ApplicationRole.fromName(role.getName()).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rol indicado no está habilitado");
+        }
         Organization organization = request.organizationId() == null
                 ? null
                 : organizationRepository.findById(request.organizationId())
@@ -213,6 +217,7 @@ public class AuthService {
     @Transactional(readOnly = true)
     public List<RoleOptionResponse> getAvailableRoles() {
         return roleRepository.findAllByOrderByNameAsc().stream()
+                .filter(role -> ApplicationRole.fromName(role.getName()).isPresent())
                 .map(role -> new RoleOptionResponse(role.getId(), role.getName(), role.getDescription()))
                 .toList();
     }
@@ -229,13 +234,19 @@ public class AuthService {
         User account = userRepository.findByEmailWithRoleAndPermissions(email)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "Credenciales incorrectas"));
-        List<String> systems = account.getRole().getPermissions().stream()
+        ApplicationRole role = ApplicationRole.fromName(account.getRole().getName())
+                .orElseThrow(() -> new IllegalStateException(
+                        "La cuenta tiene asignado un rol que no está habilitado"));
+        Set<String> permissionCodes = account.getRole().getPermissions().stream()
                 .map(permission -> permission.getCode())
-                .filter(code -> code.startsWith("SYSTEM_") && code.endsWith("_ACCESS"))
-                .map(code -> code.substring("SYSTEM_".length(), code.length() - "_ACCESS".length()))
-                .distinct()
-                .sorted()
-                .toList();
+                .collect(java.util.stream.Collectors.toSet());
+        if (!permissionCodes.equals(role.permissionCodes())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "La configuración de subsistemas del rol no es válida");
+        }
+        List<String> systems = role.allowedSystemNames();
+        String defaultSystem = role.defaultSubsystem().name();
         return new AuthResponse(
                 accessToken,
                 "Bearer",
@@ -244,9 +255,10 @@ public class AuthService {
                 account.getEmail(),
                 account.getEmail(),
                 account.getRole().getName(),
-                LoginSystem.COOPERA.name(),
+                defaultSystem,
                 systems,
-                refreshToken);
+                refreshToken,
+                defaultSystem);
     }
 
     private String issueRefreshToken(String subject) {

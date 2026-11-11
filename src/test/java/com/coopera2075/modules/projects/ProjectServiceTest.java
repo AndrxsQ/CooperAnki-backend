@@ -84,9 +84,29 @@ class ProjectServiceTest {
     }
 
     @Test
-    void rejectsCreationByCooperaNonAdmin() {
+    void createsProjectForGeneralExecutive() {
+        Organization organization = new Organization();
+        organization.setId(8L);
+        User executive = userWithRole("GENERAL_EXE");
+        executive.setId(21L);
+        executive.setEmail("general@example.com");
+
+        when(projectRepository.existsByIdentifierCode("PRJ-001")).thenReturn(false);
+        when(organizationRepository.findById(8L)).thenReturn(Optional.of(organization));
+        when(userRepository.findByEmailWithRoleAndPermissions("general@example.com"))
+                .thenReturn(Optional.of(executive));
+        when(projectRepository.save(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = projectService.create(validRequest(), "coopera:general@example.com");
+
+        assertEquals(21L, response.creatorId());
+        assertEquals(ProjectStatus.DRAFT, response.status());
+    }
+
+    @Test
+    void rejectsCreationWithoutCooperationSubsystem() {
         when(userRepository.findByEmailWithRoleAndPermissions("user@example.com"))
-                .thenReturn(Optional.of(userWithRole("COOPERANT")));
+                .thenReturn(Optional.of(userWithRole("LEGAL_EXE")));
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,

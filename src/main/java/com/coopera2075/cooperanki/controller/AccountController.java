@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/account/me")
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasAuthority('PERM_SYSTEM_PERSONAL_ACCOUNT_ACCESS')")
 public class AccountController {
     private final AccountService accountService;
 

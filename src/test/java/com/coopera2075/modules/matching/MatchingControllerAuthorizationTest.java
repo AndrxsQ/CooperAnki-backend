@@ -29,16 +29,33 @@ class MatchingControllerAuthorizationTest {
     }
 
     @Test
-    void preventsUsersWithoutCooperationAdminPermissionFromReadingRecommendations() {
+    void preventsUsersWithoutCooperationSubsystemFromReadingRecommendations() {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
                         "test-user",
                         "password",
-                        java.util.List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+                        java.util.List.of(
+                                new SimpleGrantedAuthority("ROLE_ADMIN"),
+                                new SimpleGrantedAuthority("PERM_SYSTEM_INFORMATION_MANAGEMENT_ACCESS"))));
 
         assertThrows(
                 AccessDeniedException.class,
                 () -> matchingController.getRecommendations(1L, null, null, null, null, 0, 20));
+    }
+
+    @Test
+    void allowsGeneralExecutivesWithCooperationAccessToReadRecommendations() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        "test-user",
+                        "password",
+                        java.util.List.of(
+                                new SimpleGrantedAuthority("ROLE_GENERAL_EXE"),
+                                new SimpleGrantedAuthority("PERM_SYSTEM_COOPERATION_ACCESS"))));
+
+        org.junit.jupiter.api.Assertions.assertEquals(
+                org.springframework.http.HttpStatus.OK,
+                matchingController.getRecommendations(1L, null, null, null, null, 0, 20).getStatusCode());
     }
 
     @Configuration

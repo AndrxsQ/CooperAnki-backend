@@ -2,6 +2,7 @@ package com.coopera2075.cooperanki.security;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.coopera2075.modules.auth.ApplicationRole;
 import com.coopera2075.modules.auth.User;
 import com.coopera2075.modules.auth.UserRepository;
 
@@ -33,10 +35,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private UserDetails toCooperaUserDetails(User account) {
+        ApplicationRole role = ApplicationRole.fromName(account.getRole().getName())
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "La cuenta tiene un rol que no está habilitado"));
+        Set<String> grantedPermissions = account.getRole().getPermissions().stream()
+                .map(permission -> permission.getCode())
+                .collect(java.util.stream.Collectors.toSet());
         List<String> authorities = new ArrayList<>();
-        authorities.add("ROLE_" + account.getRole().getName());
-        account.getRole().getPermissions().stream()
-                .map(permission -> "PERM_" + permission.getCode())
+        authorities.add("ROLE_" + role.name());
+        role.permissionCodes().stream()
+                .filter(grantedPermissions::contains)
+                .map(permissionCode -> "PERM_" + permissionCode)
                 .forEach(authorities::add);
 
         return org.springframework.security.core.userdetails.User.withUsername(
