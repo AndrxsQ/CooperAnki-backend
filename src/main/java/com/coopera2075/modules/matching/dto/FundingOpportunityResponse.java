@@ -1,0 +1,78 @@
+package com.coopera2075.modules.matching.dto;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import com.coopera2075.modules.matching.FundingOpportunity;
+
+public record FundingOpportunityResponse(
+        Long id,
+        String sourceUrl,
+        String title,
+        String cooperatingEntity,
+        String impactArea,
+        String requirementsDescription,
+        BigDecimal maxAmount,
+        LocalDate closingDate,
+        String donorCountry,
+        String cooperationType,
+        String organizationType,
+        String projectType,
+        String targetPopulations,
+        String applicationMethod,
+        String language,
+        String currency,
+        BigDecimal amountInCop,
+        String sourcePage,
+        String sourceDocument,
+        String opportunityStatus,
+        String opportunityStatusDetail,
+        String contactPerson,
+        String contactPhone,
+        String contactFax,
+        String contactAddress,
+        String contactCity,
+        String contactEmail,
+        String localContactPerson,
+        String localContactPhone,
+        String localContactAddress,
+        String localContactCity,
+        String localContactEmail,
+        String notes) {
+    public static FundingOpportunityResponse from(FundingOpportunity opportunity) {
+        return new FundingOpportunityResponse(
+                opportunity.getId(),
+                opportunity.getSourceUrl(),
+                opportunity.getTitle(),
+                opportunity.getCooperatingEntity(),
+                opportunity.getImpactArea(),
+                opportunity.getRequirementsDescription(),
+                opportunity.getMaxAmount(),
+                opportunity.getClosingDate(),
+                opportunity.getDonorCountry(),
+                opportunity.getCooperationType(),
+                opportunity.getOrganizationType(),
+                opportunity.getProjectType(),
+                opportunity.getTargetPopulations(),
+                opportunity.getApplicationMethod(),
+                opportunity.getLanguage(),
+                opportunity.getCurrency(),
+                opportunity.getAmountInCop(),
+                opportunity.getSourcePage(),
+                opportunity.getSourceDocument(),
+                opportunity.getOpportunityStatus(),
+                opportunity.getOpportunityStatusDetail(),
+                opportunity.getContactPerson(),
+                opportunity.getContactPhone(),
+                opportunity.getContactFax(),
+                opportunity.getContactAddress(),
+                opportunity.getContactCity(),
+                opportunity.getContactEmail(),
+                opportunity.getLocalContactPerson(),
+                opportunity.getLocalContactPhone(),
+                opportunity.getLocalContactAddress(),
+                opportunity.getLocalContactCity(),
+                opportunity.getLocalContactEmail(),
+                opportunity.getNotes());
+    }
+}
